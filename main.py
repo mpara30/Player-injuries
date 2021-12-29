@@ -15,6 +15,18 @@ sum_injuries = injury[injuries_list].sum(axis = 1)
 injury.insert(4, 'InjuryNumbers', sum_injuries)
 injury.to_csv("Injuries_Updated.csv")
 
+# Sortare descrescatoare a echipelor in functie de InjuryNumbers
+print((injury[['TeamName', 'InjuryNumbers']].copy()).sort_values(by = ['InjuryNumbers'], ascending=False))
+
+# Stacked bar pe echipe
+culori_stack = ['darkorange', 'royalblue', 'silver', 'red', 'forestgreen', 'chocolate', 'plum', 'aqua',
+                'gold', 'tomato', 'springgreen', 'darkkhaki', 'indigo', 'deeppink', 'steelblue']
+injury.plot(x='Abbreviation', y = injuries_list, color = culori_stack, kind='bar', stacked=True,
+            title='Grafic Stacked Bar a tipurilor de accidentari pe echipe')
+plt.legend(loc = 'best', frameon = False, ncol = 2)
+plt.yticks(np.arange(0, 70, 5))
+plt.show()
+
 # Calcul procente
 def c_proc():
 
@@ -56,11 +68,13 @@ sort_desc = total_sume.sort_values(ascending=False)
 print(sort_desc)
 
 # Grafic bar-chart pt valorile fiecarui tip principal de accidentare dintr-o echipa
-injury.plot.bar(x = 'Abbreviation', y = ['Ankle','Calf','COVID19','Groin','Knee','Knock','Thigh'])
+injury.plot.bar(x = 'Abbreviation', y = ['Ankle','Calf','COVID19','Groin','Knee','Knock','Thigh'],
+               title = 'Bar Chart al accidentarilor importante pentru fiecare echipa')
 plt.show()
 
 # Grafic heatmap pt a vedea corelatia dintre accidentari
-sb.heatmap(injury.corr().loc['Ankle':'OthMembers', 'Ankle':'OthMembers'], cmap='coolwarm', annot=True)
+sb.heatmap(injury.corr().loc['Ankle':'OthMembers', 'Ankle':'OthMembers'], cmap='coolwarm', annot=True).
+set(title = 'Corelograma a accidentarilor')
 plt.show()
 
 # Calcul procentaj al jucatorilor accidentati
@@ -72,11 +86,13 @@ print(injury)
 # Grafic barchart pt procentajul jucatorilor accidentati
 x = injury['Abbreviation']
 y = injury['Inj_Numb_Perc']
+culori_echipe = ['red', 'maroon', 'dodgerblue', 'indianred', 'mediumblue',
+                 'cornflowerblue', 'blue', 'gainsboro', 'gold', 'mediumpurple',
+                 'crimson', 'deepskyblue', 'red', 'black', 'indianred',
+                 'mistyrose', 'navy', 'yellowgreen', 'maroon', 'darkorange']
 plt.yticks(np.arange(0, y.max(), 5))
-for bar in plt.bar(x, height = y, width=.6, color=['red', 'maroon', 'dodgerblue', 'indianred', 'mediumblue',
-                                                   'cornflowerblue', 'blue', 'gainsboro', 'gold', 'mediumpurple',
-                                                   'crimson', 'deepskyblue', 'red', 'black', 'indianred',
-                                                   'mistyrose', 'navy', 'yellowgreen', 'maroon', 'darkorange']):
+for bar in plt.bar(x, height = y, width=.6, color=culori_echipe):
     yval = bar.get_height()
     plt.text(bar.get_x(), yval + .5, yval)
+plt.title("Procentajul jucatorilor accidentati in functie de echipa")
 plt.show()
