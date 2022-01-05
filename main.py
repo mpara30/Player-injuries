@@ -27,6 +27,12 @@ plt.legend(loc = 'best', frameon = False, ncol = 2)
 plt.yticks(np.arange(0, 70, 5))
 plt.show()
 
+# Sortare tipuri de accidentari pentru fiecare echipa
+acc_dframe = injury.drop(injury.columns[[0, 2, 3, 4]], axis=1).copy().set_index('Abbreviation')
+inj_lst = [[z for z,p in sorted(zip(acc_dframe.columns.values.tolist(), x), key=lambda y: y[1], reverse=True)]
+      for x in acc_dframe.apply(lambda x : x.rank(),1).values.tolist()]
+print(pd.Series(data=inj_lst,index=acc_dframe.index))
+
 # Calcul procente
 def c_proc():
 
@@ -56,20 +62,38 @@ print(new_pechipe)
 new_pechipe.to_csv("Aprox. Percentages per teams.csv")
 
 # Calcul total pentru coloanele numerice
-new_injury = pd.read_csv("Injuries Databases.csv")
-total_sume = new_injury.select_dtypes(np.number).sum().rename('TOTAL')
-new_injury.loc[len(new_injury.index)] = total_sume
-new_injury = new_injury.rename(index = {new_injury.index[20]:"TOTAL"})
+new_injury = pd.read_csv("Injuries_Updated.csv")
+print(new_injury.select_dtypes(np.number).sum().rename('TOTAL').sort_values(ascending=False))
+
+# Adaugare valori TOTAL ca rand in DataFrame
+new_injury.loc[len(new_injury.index)] = new_injury.select_dtypes(np.number).sum()
+new_injury = new_injury.drop(new_injury.iloc[:, 0:4], axis=1).copy().\
+    rename(index = {new_injury.index[20]:"TOTAL"}).astype(int)
 print(new_injury)
 new_injury.to_csv("Injuries_with_TOTAL.csv")
 
-# Sortare sume totale descrescator
-sort_desc = total_sume.sort_values(ascending=False)
-print(sort_desc)
+# Creare DataFrame doar cu totalul fiecarei categorii in parte
+new_injury_total = new_injury.loc["TOTAL"].reset_index()
+new_injury_total = new_injury_total.rename(columns={new_injury_total.columns[0]:'Categories'}).reset_index(drop=True)
+new_injury_total['Percent'] = (new_injury_total['TOTAL']/new_injury_total.iloc[0, 1]*100).map('{:.2f}'.format).astype(float)
+new_injury_total = new_injury_total.drop(0, axis = 0)
+print(new_injury_total)
+
+#Grafic Bar Chart pentru afisarea procentelor aferente fiecarei categorii
+# raportat la numarul total de accidentari
+x = new_injury_total['Categories']
+y = new_injury_total['Percent']
+plt.yticks(np.arange(0, y.max(), 2.5))
+for bar in plt.bar(x, height = y, width=.5, color=culori_stack):
+    yval = bar.get_height()
+    plt.text(bar.get_x(), yval + .2, yval)
+plt.title("Procentajul tipurilor de accidentari raportat la numarul total")
+plt.show()
 
 # Grafic bar-chart pt valorile fiecarui tip principal de accidentare dintr-o echipa
-injury.plot.bar(x = 'Abbreviation', y = ['Ankle','Calf','COVID19','Groin','Knee','Knock','Thigh'],
+injury.plot.bar(x = 'Abbreviation', y = ['Knee','Knock','Thigh'],
                title = 'Bar Chart al accidentarilor importante pentru fiecare echipa')
+plt.yticks(np.arange(0, 31, 2))
 plt.show()
 
 # Grafic heatmap pt a vedea corelatia dintre accidentari
