@@ -24,10 +24,10 @@ injury.to_csv("Injuries_Updated.csv", index=False)
 print((injury[['TeamName', 'InjuryNumbers']].copy()).sort_values(by = ['InjuryNumbers'], ascending=False))
 
 # 1.4. Creare grafic Stacked bar pe echipe
-culori_stack = ['darkorange', 'royalblue', 'silver', 'red', 'forestgreen', 'chocolate', 'plum', 'aqua',
-                'gold', 'tomato', 'springgreen', 'darkkhaki', 'indigo', 'deeppink', 'steelblue']
+culori_stack = ['darkorange', 'royalblue', 'silver', 'red', 'forestgreen', 'chocolate', 'violet', 'aqua',
+                'gold', 'tomato', 'springgreen', 'darkkhaki', 'skyblue', 'pink', 'steelblue']
 injury.plot(x='Abbreviation', y = injuries_list, color = culori_stack, kind='bar', stacked=True,
-            title='Grafic Stacked Bar a tipurilor de accidentari pe echipe')
+            title='Grafic Stacked Bar al tipurilor de accidentari, pentru fiecare echipa')
 plt.legend(loc = 'best', frameon = False, ncol = 2)
 plt.yticks(np.arange(0, 70, 5))
 plt.show()
@@ -66,6 +66,33 @@ p_echipe.to_csv("Percentages per teams.csv")
 print(p_echipe.applymap('{:.2f}'.format).astype(float))
 (p_echipe.applymap('{:.2f}'.format).astype(float)).to_csv("Aprox. Percentages per teams.csv")
 
+# 2.4. Importare date din noul DataFrame
+perc_teams = pd.read_csv("Aprox. Percentages per teams.csv", index_col=False)
+print(perc_teams)
+
+# 2.5. Creare grafic horizontal stacked bar doar pentru o echipa
+echipa_graf = perc_teams[perc_teams['Abbreviation'] == input(str)]
+single_graf = echipa_graf.plot(x='Abbreviation', y= injuries_list, color = culori_stack, kind = 'barh',
+             stacked=True, width=.03, figsize=(6, 5),  alpha = .85)
+for c in single_graf.containers:
+    single_graf.bar_label(c, labels = [f'{w:.2f}' if (w := v.get_width()) > 0 else '' for v in c],
+                          fontsize=7, label_type='center')
+single_graf.set_xlabel('Procente (%)', fontsize = 10)
+single_graf.set_title("Procentaj al accidentarilor, raportat la numarul lor total, pentru fiecare echipa")
+plt.legend(loc = 'best', ncol = 2)
+plt.show()
+
+# 2.6. Creare grafic horizontal stacked bar pentru toate echipele
+multiple_graf = perc_teams.plot(x='Abbreviation', y= injuries_list, color = culori_stack, kind = 'barh',
+             stacked=True, width=.8, mark_right = True, alpha = .8)
+for c in multiple_graf.containers:
+    multiple_graf.bar_label(c, labels = [f'{w:.2f}' if (w := v.get_width()) > 0 else '' for v in c],
+                            fontsize=6.5, label_type='center')
+multiple_graf.set_xlabel('Procente (%)')
+multiple_graf.set_title("Procentaj al accidentarilor, raportat la numarul lor total, pentru fiecare echipa")
+plt.legend(bbox_to_anchor=(1, 1), loc='upper left',  ncol = 1)
+plt.show()
+
 # III. Creare DataFrame pentru totalul fiecarei categorii in parte
 
 # 3.1. Calcul total pentru coloanele numerice
@@ -88,36 +115,39 @@ print(new_injury_total)
 
 # IV. Analiza pe grafice
 
-# 4.1.1. Grafic Bar Chart pentru afisarea procentelor aferente fiecarei categorii
+# 4.1. Creare grafice pentru afisarea procentelor aferente fiecarei categorii
 # raportat la numarul total de accidentari
+# 4.1.1. Grafic Bar Chart
 x = new_injury_total['Categories']
 y = new_injury_total['Percent']
 plt.yticks(np.arange(0, y.max(), 2.5))
 for bar in plt.bar(x, height = y, width=.5, color=culori_stack):
     yval = bar.get_height()
     plt.text(bar.get_x(), yval + .2, yval)
-plt.title("Procentajul tipurilor de accidentari raportat la numarul total")
+plt.xticks(rotation=45, horizontalalignment='right', fontweight='light', fontsize=10)
+plt.title("Procentajul tipurilor de accidentari, raportat la numarul lor total")
 plt.show()
-# 4.1.2. Grafic Treemap pentru afisarea procentelor aferente fiecarei categorii
+# 4.1.2. Grafic Treemap
 lbl_tree = [f'{el[0]} = {el[1]}%' for el in zip(new_injury_total['Categories'], new_injury_total['Percent'])]
 plt.figure(figsize=(12,8), dpi= 80)
 sq.plot(sizes = new_injury_total['Percent'], label = lbl_tree, color = culori_stack, alpha=.7)
-plt.title('Grafic Treemap pentru afisarea procentelor de accidentari raportat la total')
+plt.title('Grafic Treemap pentru afisarea procentelor de accidentari, raportat la total', fontsize = 14)
 plt.axis('off')
 plt.show()
 
 # 4.2. Grafic bar-chart pt valorile fiecarui tip principal de accidentare dintr-o echipa
-injury.plot.bar(x = 'Abbreviation', y = ['Knee','Knock','Thigh'],
-                title = 'Bar Chart al accidentarilor importante pentru fiecare echipa')
+injury.plot.bar(x = 'Abbreviation', y = ['Ankle','Knock','Thigh'],
+                title = 'Bar Chart al categoriilor principale de accidentari')
 plt.yticks(np.arange(0, 31, 2))
 plt.show()
 
-# 4.3. Grafic heatmap pt a vedea corelatia dintre accidentari
+# 4.3. Grafic heatmap pt corelatia dintre accidentari
 sb.heatmap(injury.corr().loc['Ankle':'OthMembers', 'Ankle':'OthMembers'], cmap='coolwarm', annot=True).\
     set(title = 'Corelograma a accidentarilor')
+plt.xticks(rotation=40, ha="right")
 plt.show()
 
-# 4.4. Grafic barchart pt procentajul jucatorilor accidentati
+# 4.4. Grafic bar-chart pt procentajul jucatorilor accidentati
 # 4.4.1. Adaugare coloana noua in tabel cu calcul procentaj al jucatorilor accidentati
 injury['Player_Inj_Perc'] = ((injury['InjuredPlayers'] / injury['PlayerNumbers']) * 100)\
     .map('{:.2f}'.format).astype(float)
@@ -129,11 +159,11 @@ culori_echipe = ['red', 'maroon', 'dodgerblue', 'indianred', 'mediumblue',
                  'cornflowerblue', 'blue', 'gainsboro', 'gold', 'mediumpurple',
                  'crimson', 'deepskyblue', 'red', 'black', 'indianred',
                  'mistyrose', 'navy', 'yellowgreen', 'maroon', 'darkorange']
-plt.yticks(np.arange(0, y.max(), 5))
-for bar in plt.bar(x, height = y, width=.6, color=culori_echipe):
+plt.yticks(np.arange(0, y.max(), 10))
+for bar in plt.bar(x, height = y, width=.7, color=culori_echipe):
     yval = bar.get_height()
     plt.text(bar.get_x(), yval + .5, yval)
-plt.title("Procentajul jucatorilor accidentati in functie de echipa")
+plt.title("Procentajul jucatorilor accidentati, in functie de echipa")
 plt.show()
 
 # V. Creare DataFrame cu noile date si clasamentul campionatului
