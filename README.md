@@ -5,23 +5,41 @@ Ideea principala a acestui studiu a pornit de la un subiect comun, fotbalul, si 
 Fisierul csv principal a fost constituit din datele, preluate de pe anumite site-uri ce inregistreaza astfel de statistici si organizat pe coloane, in acest fel:
 
 TeamName = numele echipelor din Premier League
+
 Abbreviation = abrevirea numelor acestor echipe
+
 PlayerNumbers = numărul jucătorilor din lot
+
 InjuredPlayers = numărul jucătorilor accidentați din lot
+
 Ankle = numărul accidentărilor din zona gleznelor
+
 Back = numărul accidentărilor din zona spatelui
+
 Calf = numărul accidentărilor din zona gambelor
+
 COVID19 = numărul jucătorilor infectați cu acest virus
+
 Foot = numărul accidentărilor din zona picioarelor (tot ce ține de partea lor inferioară)
+
 Groin = numărul accidentărilor din zona inghinală
+
 Hamstring = numărul accidentărilor suferite asupra tendonului, aflat între șold și genunchi
+
 Head = numărul accidentărilor din zona craniană
+
 Knee = numărul accidentărilor din zona genunchilor
+
 Knock = numărul accidentărilor suferite în urma unor simple lovituri
+
 Muscles = numărul accidentărilor care afectează toți mușchii din corp
+
 Shoulder = numărul accidentărilor din zona umerilor
+
 Thigh = numărul accidentărilor din zona coapselor
+
 OthCauses = numărul accidentărilor apărute din alte cauze (boli, lipsă de pregătire fizica etc.)
+
 OthMembers = numărul accidentărilor în zone minore (abdoment, șold, mână, gât etc.)
 
 Scriptul de python a fost organizat in urmatoarele puncte, pentru a fi mai usor de implementat ideile ce tin de aceasta analiza:
