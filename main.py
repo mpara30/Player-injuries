@@ -71,7 +71,7 @@ perc_teams = pd.read_csv("Aprox. Percentages per teams.csv", index_col=False)
 print(perc_teams)
 
 # 2.5. Creare grafic horizontal stacked bar doar pentru o echipa
-echipa_graf = perc_teams[perc_teams['Abbreviation'] == input(str)]
+echipa_graf = perc_teams[perc_teams['Abbreviation'] == input("Choose the team by its Abbreviation: ")]
 single_graf = echipa_graf.plot(x='Abbreviation', y= injuries_list, color = culori_stack, kind = 'barh',
              stacked=True, width=.03, figsize=(6, 5),  alpha = .85)
 for c in single_graf.containers:
